@@ -1,5 +1,7 @@
 # 步骤
+
 ### 1、异常类
+
 ```java
 package com.walker.dianping.common.exceptions;
 
@@ -18,7 +20,9 @@ public class BizException extends RuntimeException {
 }
 
 ```
+
 ### 2、统一异常处理配置类
+
 ```java
 package com.walker.dianping.common.config;
 
@@ -47,9 +51,15 @@ public class MyExceptionHandler {
 
 }
 
+
 ```
+
+<!-- more -->
+
 ### 3、断言类
+
 可以自己进行补充
+
 ```java
 package com.walker.dianping.common.utils;
 
@@ -73,10 +83,13 @@ public abstract class Assert {
 }
 
 ```
+
 ### 4、使用
+
 ```java
 //查询类，如果类不存在则抛出异常
 TbSeckillVoucherEntity entity = getById(voucherId);
  Assert.isNull(entity,"该"+voucherId+"优惠券不存在");
 ```
+
 可以让代码变得相对简洁

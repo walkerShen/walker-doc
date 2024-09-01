@@ -1,14 +1,12 @@
-> > - [ ] 大家好，我是walker
-一个从文科自学转行的程序员~
- 爱好编程，偶尔写写编程文章和生活 
- 欢迎关注公众号【**I am Walker**】，回复“电子书”，就可以获得200多本编程相关电子书哈~
- 我的gitee：[https://gitee.com/shen-chuhao/walker.git](https://gitee.com/shen-chuhao/walker.git)  里面很多技术案例！
+在分布式的情况下，我们没法使用本地的锁进行加锁从而实现并发同步，这个使用我们就需要使用到 redis 实现的分布式锁了
+这里的话介绍的是 redisson，也是官方推荐使用的
 
-在分布式的情况下，我们没法使用本地的锁进行加锁从而实现并发同步，这个使用我们就需要使用到redis实现的分布式锁了
-这里的话介绍的是redisson，也是官方推荐使用的
-# 
+#
+
 # 步骤
+
 ## 1、导入依赖
+
 ```xml
 <!--        redisson-->
         <dependency>
@@ -21,21 +19,23 @@
         </dependency>
 
 ```
-## 2、编写application.yml
+
+## 2、编写 application.yml
+
 ```yaml
 spring:
   redis:
     host: 127.0.0.1
     port: 6379
     password:
-  # redisson配置文件路径
+    # redisson配置文件路径
     redisson:
       file: classpath:redisson.yml
-
 ```
-## 3、在resource下面创建redisson.yml
-```yaml
 
+## 3、在 resource 下面创建 redisson.yml
+
+```yaml
 # 单节点配置
 singleServerConfig:
   # 连接空闲超时，单位：毫秒
@@ -76,11 +76,17 @@ singleServerConfig:
 # 编码
 codec: !<org.redisson.codec.JsonJacksonCodec> {}
 # 传输模式
-transportMode : "NIO"
+transportMode: "NIO"
 ```
+
+<!-- more -->
+
 ## 4、测试
+
 ### 方法一：test
+
 #### 1、编写测试类
+
 ```java
 package com.walker;
 
@@ -106,7 +112,7 @@ public class RedissonTest {
         //获取锁
         RLock lock = redissonClient.getLock(LOCK);
 
-        
+
         //执行多个线程去获取锁和释放锁
         for (int i = 0; i < 5; i++) {
             new Thread(()->{
@@ -129,12 +135,18 @@ public class RedissonTest {
 }
 
 ```
+
 #### 2、测试
+
 执行测试方法，之后发现每次只有一个线程可以获取锁和释放锁
 ![image.png](https://img-blog.csdnimg.cn/img_convert/ef30f1aad0347dd505dca416632bd6e5.png#clientId=ua2890fa5-5efd-4&from=paste&height=210&id=u18066995&margin=%5Bobject%20Object%5D&name=image.png&originHeight=210&originWidth=517&originalType=binary&ratio=1&size=15346&status=done&style=none&taskId=u02c74451-74df-403d-be18-d67aace0c1b&width=517#errorMessage=unknown%20error&id=VZPHE&originHeight=210&originWidth=517&originalType=binary&ratio=1&rotation=0&showTitle=false&status=error&style=none)
+
 ### 方法二：controller
-#### 1、编写controller
-编写两个方法，先执行get1方法 执行执行get2，尽量保证两个方法同时执行，会发现get1会先执行，然后由于get2获取不到锁，所以会等待一段时间之后才会执行
+
+#### 1、编写 controller
+
+编写两个方法，先执行 get1 方法 执行执行 get2，尽量保证两个方法同时执行，会发现 get1 会先执行，然后由于 get2 获取不到锁，所以会等待一段时间之后才会执行
+
 ```java
 package com.walker.controller;
 
@@ -187,9 +199,11 @@ public class RedissonController {
 }
 
 ```
+
 #### 2、测试
-这里get1获取锁之后输出数据，但是没有立即将锁释放
-然后get2过了一段时间之后才能够拿到锁，这里的时间可能都不同，因为点击get2接口的时候有快有慢，就会导致时间不一致了，
+
+这里 get1 获取锁之后输出数据，但是没有立即将锁释放
+然后 get2 过了一段时间之后才能够拿到锁，这里的时间可能都不同，因为点击 get2 接口的时候有快有慢，就会导致时间不一致了，
 但是都可能证明，必须要持有锁才能继续执行，否则就会进行等待
 ![image.png](https://img-blog.csdnimg.cn/img_convert/087aafa1e9453c1096d8fd85c395f836.png#clientId=ua2890fa5-5efd-4&from=paste&height=76&id=u1fd5fe6a&margin=%5Bobject%20Object%5D&name=image.png&originHeight=76&originWidth=407&originalType=binary&ratio=1&size=3847&status=done&style=none&taskId=u743fc6e4-9ddc-4d85-aa8a-f6712b6ebc4&width=407#errorMessage=unknown%20error&id=iiRLA&originHeight=76&originWidth=407&originalType=binary&ratio=1&rotation=0&showTitle=false&status=error&style=none)
 

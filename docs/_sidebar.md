@@ -1,10 +1,10 @@
 - SpringBoot 系列
-  - [text](note/springboot/SpringBoot+Minio实现文件对象存储.md)
-  - [text](note/springboot/Springboot+Redisson实现分布式锁.md)
-  - [text](note/springboot/Springboot断言异常封装、与统一异常处理实现.md)
-  - [text](note/springboot/SpringBoot实现自定义注解加解密.md)
-  - [text](note/springboot/Springboot项目Redis缓存异常实战.md)
-  - [text](note/springboot/Springboot整合线程池最佳实践.md)
-  - [text](note/springboot/Springboot整合Filter_拦截器_注解+aop的方式实现token校验.md)
-  - [text](note/springboot/Springboot整合knife4j实现文档.md)
+  - [SpringBoot+Minio 实现文件对象存储](note/springboot/SpringBoot+Minio实现文件对象存储.md)
+  - [Springboot+Redisson 实现分布式锁](note/springboot/Springboot+Redisson实现分布式锁.md)
+  - [Springboot 断言异常封装、与统一异常处理实现](note/springboot/Springboot断言异常封装、与统一异常处理实现.md)
+  - [SpringBoot 实现自定义注解加解密](note/springboot/SpringBoot实现自定义注解加解密.md)
+  - [Springboot 项目 Redis 缓存异常实战](note/springboot/Springboot项目Redis缓存异常实战.md)
+  - [Springboot 整合线程池最佳实践](note/springboot/Springboot整合线程池最佳实践.md)
+  - [Springboot 整合 Filter*拦截器*注解+aop 的方式实现 token 校验](note/springboot/Springboot整合Filter_拦截器_注解+aop的方式实现token校验.md)
+  - [Springboot 整合 knife4j 实现文档](note/springboot/Springboot整合knife4j实现文档.md)
 - 面试题系列

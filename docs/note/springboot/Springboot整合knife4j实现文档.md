@@ -1,6 +1,9 @@
-## springboot整合
+## springboot 整合
+
 文档:[https://doc.xiaominfo.com/](https://doc.xiaominfo.com/)
+
 ### 1、导入依赖
+
 ```xml
 <!--引入Knife4j的官方start包,该指南选择Spring Boot版本<3.0,开发者需要注意-->
 <dependency>
@@ -15,6 +18,7 @@
 ```
 
 ### 2、编写配置类
+
 ```java
 package com.walker.dianping.common.config;
 
@@ -43,7 +47,7 @@ public class Knife4jConfiguration {
                 .version("1.0") // 版本
                 .build())
                 .groupName("用户服务") //分组名称
-                .select() 
+                .select()
                 //这里指定Controller扫描包路径
                 .apis(RequestHandlerSelectors.basePackage("com.walker.dianping.controller"))
                 .paths(PathSelectors.any())
@@ -53,7 +57,11 @@ public class Knife4jConfiguration {
 }
 
 ```
-### 3、编写controller类
+
+<!-- more -->
+
+### 3、编写 controller 类
+
 ```java
 @Api(tags = "首页模块") //写在控制类的标签
 @RestController
@@ -69,6 +77,8 @@ public class IndexController {
     }
 }
 ```
+
 ### 4、启动项目后访问 [http://ip:port/doc.thml](http://ip:port/doc.thml)
+
 例如： [http://localhost:8080/doc.html](http://localhost:8080/doc.html)
 注意：如果有做名单拦截的话，需要将其设为白名单

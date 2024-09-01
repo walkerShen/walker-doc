@@ -2,44 +2,187 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="referrer" content="no-referrer" />
   <title>Document</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <meta name="description" content="Description">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/themes/pure.css">
+  <link rel="stylesheet" href="//unpkg.com/docsify/themes/vue.css">
+  <style>
+    /* 添加一些基本的样式来美化弹窗 */
+    .modal {
+      display: none; 
+      position: fixed; 
+      z-index: 1; 
+      padding-top: 100px; 
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgb(0,0,0); 
+      background-color: rgba(0,0,0,0.4); 
+    }
+    
+    .modal-content {
+      background-color: #fefefe;
+      margin: auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 20%;
+    }
 
+    .qrCode{
+      display: block;
+      margin: 0 auto; /* 水平居中 */
+    }
+    
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+    
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
   <div id="app"></div>
+
+   <!-- 弹窗 HTML -->
+  <div id="myModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <div>初始化访问：反爬虫、人机识别</div>
+      <img class="qrCode" src="image/qrcode.jpg" alt="verification" style="width:100px; height:100px;">
+      <p>关注微信公众号，回复:验证码</p>
+      <input type="text" id="userInput" placeholder="请输入验证码">
+      <button onclick="checkInput()">提交验证码</button>
+    </div>
+  </div>
+
+
   <script>
       window.$docsify = {
-      name: 'EasyioLib for ESP32', // 文档标题，会显示在侧边栏顶部
+      name: 'Walker编程学习小圈', // 文档标题，会显示在侧边栏顶部
       repo: 'https://github.com/ZhiliangMa/easyio-lib-for-esp32', // 右上角Github图标链接
       loadNavbar: true, // 默认加载 _navbar.md，作为顶部导航栏
       loadSidebar: true,// 默认加载 _sidebar.md，作为侧边栏
-      subMaxLevel: 3, // 生成目录的最大层级
+      // subMaxLevel: 2, // 生成目录的最大层级
       search: {
         paths: 'auto',
         placeholder: '搜索',
         noData: '找不到结果',
         depth: 3,
       },
+      // 字数统计
+      count:{
+        countable:true,
+        fontsize:'0.9em',
+        color:'rgb(90,90,90)',
+        language:'chinese'
+      },
       // coverpage: true,  // 封面
+
+      markdown: {
+        renderer: {
+          code: function (code, lang) {
+            if (lang === 'more') {
+              return `<div class="more">${code}</div>`;
+            }
+            return this.origin.code.apply(this, arguments);
+          }
+        }
+      },
+      plugins: [
+        function(hook) {
+          hook.afterEach(function(html, next) {
+            var moreIndex = html.indexOf('<!-- more -->');
+            if (moreIndex !== -1) {
+              var beforeMore = html.slice(0, moreIndex);
+              var afterMore = html.slice(moreIndex + 13);
+              html = `${beforeMore}<div class="more-content" style="display:none;">${afterMore}</div>
+                      <button onclick="showModal()" class="read-more-btn">显示全部</button>`;
+            }
+            next(html);
+          });
+
+          hook.doneEach(function() {
+            if (localStorage.getItem('verified') === 'true') {
+              showAllContent();
+            } else {
+              var buttons = document.querySelectorAll('.read-more-btn');
+              buttons.forEach(function(button) {
+                button.addEventListener('click', showModal);
+              });
+            }
+          });
+        }
+      ]
+    };
+
+    function showModal() {
+      var modal = document.getElementById('myModal');
+      modal.style.display = 'block';
+    }
+
+    function closeModal() {
+      var modal = document.getElementById('myModal');
+      modal.style.display = 'none';
+    }
+
+    function checkInput() {
+      var userInput = document.getElementById('userInput').value;
+      var correctAnswer = "正确答案"; // 设置正确答案
+      var answers=["888666","202408","666888"];
+      if (answers.includes(userInput)) {
+        // 设置浏览器缓存为已验证状态
+        localStorage.setItem('verified', 'true');
+        showAllContent();
+        closeModal();
+      } else {
+        alert("输入错误，请重试！");
+      }
+    }
+
+    function showAllContent() {
+      document.querySelectorAll('.more-content').forEach(function(content) {
+        content.style.display = 'block';
+      });
+      document.querySelectorAll('.read-more-btn').forEach(function(button) {
+        button.style.display = 'none';
+      });
     }
 
   </script>
+  <script src="//cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+
   <!-- Docsify v4 -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
    <!-- 搜索插件 -->
    <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
      <!-- 代码高亮 -->
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
+  <!-- 复制代码 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code"></script>
+  <script src="//unpkg.com/docsify-count/dist/countable.js"></script>
+
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-c.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-shell-session.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-python.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-http.min.js"></script>
+  <!-- java高亮显示 -->
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.22.0/components/prism-java.min.js"></script>
+
 
 </body>
 </html>

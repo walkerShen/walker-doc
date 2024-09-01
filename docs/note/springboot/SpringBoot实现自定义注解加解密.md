@@ -1,5 +1,7 @@
 # 前提
+
 ## 引入依赖
+
 ```xml
  //web
 <dependency>
@@ -22,8 +24,11 @@
         </dependency>
 
 ```
+
 # 1、定义注解
-## 加密注解类Encrypt
+
+## 加密注解类 Encrypt
+
 ```java
 package com.walker.encrypt.anotation;
 
@@ -41,7 +46,11 @@ public @interface Encrypt {
 }
 
 ```
+
 ## 解密注解类
+
+<!-- more -->
+
 ```java
 package com.walker.encrypt.anotation;
 
@@ -59,7 +68,9 @@ public @interface Decrypt {
 }
 
 ```
+
 # 2、编写工具类
+
 ```java
 package com.walker.encrypt.util;
 
@@ -108,13 +119,18 @@ public class AESUtil {
 
 }
 ```
+
 # 3、配置密钥和密钥类
+
 ## 1、application.properties
+
 ```properties
 #长度为16位
 body.encrypt.key=iamwalkerencrypt
 ```
+
 ## 2、属性类
+
 ```java
 package com.walker.encrypt.properties;
 
@@ -127,8 +143,11 @@ public class EncryptProperties {
     private String key;
 }
 ```
+
 # 4、相关类
+
 ## 1、响应类
+
 ```java
 package com.walker.encrypt.model;
 
@@ -163,9 +182,13 @@ public class R {
 }
 
 ```
+
 ## 2、用户类 【主要用于测试】
+
 # 5、配置类
+
 ## 解密请求参数类
+
 ```java
 package com.walker.encrypt.config;
 
@@ -312,7 +335,7 @@ public class DecryptRequest extends RequestBodyAdviceAdapter {
             byte[] decrypt = AESUtil.decrypt(body, keyByte);
             //将解密的字节放入字节数组输入流中
             ByteArrayInputStream bais = new ByteArrayInputStream(decrypt);
-            
+
             //返回HttpInputMessage
             return new HttpInputMessage() {
                 @Override
@@ -335,7 +358,9 @@ public class DecryptRequest extends RequestBodyAdviceAdapter {
 }
 
 ```
+
 ## 加密返回结果类
+
 ```java
 package com.walker.encrypt.config;
 
@@ -404,7 +429,9 @@ public class EncrptResponse implements ResponseBodyAdvice<R> {
 }
 
 ```
-# 6、编写controller
+
+# 6、编写 controller
+
 ```java
 package com.walker.encrypt.cotroller;
 
@@ -442,13 +469,19 @@ public class EncryptController {
 }
 
 ```
+
 # 7、测试
+
 ## 1、返回结果加密
+
 ![](https://img-blog.csdnimg.cn/img_convert/9bce2ea8300a8c59012a324d6d4a7226.png#clientId=u94a3d566-e293-4&crop=0&crop=0&crop=1&crop=1&from=paste&height=478&id=u597af687&originHeight=478&originWidth=959&originalType=binary&ratio=1&rotation=0&showTitle=false&size=45752&status=done&style=none&taskId=u5eb7ac5c-5a26-470c-95eb-b9cc38aa32f&title=&width=959#errorMessage=unknown%20error&id=sprnE&originHeight=478&originWidth=959&originalType=binary&ratio=1&rotation=0&showTitle=false&status=error&style=none)
+
 ## 2、请求参数解密
+
 ![](https://img-blog.csdnimg.cn/img_convert/aa6af998ee63896ae7472dc4ddaf9bda.png#clientId=u94a3d566-e293-4&crop=0&crop=0&crop=1&crop=1&from=paste&height=566&id=u968d86cc&originHeight=566&originWidth=1008&originalType=binary&ratio=1&rotation=0&showTitle=false&size=61409&status=done&style=none&taskId=u30964a50-3b45-4060-81b9-1a02dce1312&title=&width=1008#errorMessage=unknown%20error&id=aaHQQ&originHeight=566&originWidth=1008&originalType=binary&ratio=1&rotation=0&showTitle=false&status=error&style=none)
 
 # 原理
-本质用的还是AOP的思想
+
+本质用的还是 AOP 的思想
 
 参考文档：[https://mp.weixin.qq.com/s/xq9bmpLJw6aqttTPyq_omA](https://mp.weixin.qq.com/s/xq9bmpLJw6aqttTPyq_omA)

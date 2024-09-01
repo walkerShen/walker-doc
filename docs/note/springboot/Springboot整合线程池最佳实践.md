@@ -1,6 +1,9 @@
-## 封装ThreadPoolTaskExecutor线程池
-### 1、新增application.yml配置
-这里主要是配置ThreadPoolTastExecutor比较重要的参数
+## 封装 ThreadPoolTaskExecutor 线程池
+
+### 1、新增 application.yml 配置
+
+这里主要是配置 ThreadPoolTastExecutor 比较重要的参数
+
 ```yaml
 thread:
   poolexecutor:
@@ -10,8 +13,11 @@ thread:
     keppAliveSeconds: 60 # 存活时间
     prefixName: "taskExecutor-" # 线程名称前缀
 ```
-### 2、properties类
-这个是为了简化代码，不用@Value一个一个去获取值
+
+### 2、properties 类
+
+这个是为了简化代码，不用@Value 一个一个去获取值
+
 ```java
 package com.walker.async.common.properties;
 
@@ -32,8 +38,11 @@ public class ThreadPoolProperties {
 
 
 ```
+
 ### 3、配置类
-配置线程池，并将其注入到bean中
+
+配置线程池，并将其注入到 bean 中
+
 ```java
 package com.walker.async.common.config;
 
@@ -73,7 +82,11 @@ public class ThreadPoolConfig {
 }
 
 ```
-### 4、封装Service和service实现类,方便管理
+
+<!-- more -->
+
+### 4、封装 Service 和 service 实现类,方便管理
+
 ```java
 package com.walker.async.service.async;
 
@@ -83,6 +96,7 @@ public interface TestAsync {
 }
 
 ```
+
 ```java
 package com.walker.async.service.async.impl;
 
@@ -107,7 +121,9 @@ public class TestAsyncImpl implements TestAsync {
 }
 
 ```
+
 ### 5、测试
+
 ```java
 package com.walker.async;
 
@@ -132,7 +148,9 @@ public class AsyncTest {
 }
 
 ```
+
 返回结果：
+
 ```java
 2023-01-29 16:47:12.491  INFO 13332 --- [ taskExecutor-2] c.w.a.service.async.impl.TestAsyncImpl   : == async start==
 2023-01-29 16:47:12.491  INFO 13332 --- [ taskExecutor-1] c.w.a.service.async.impl.TestAsyncImpl   : == async start==
@@ -166,10 +184,13 @@ public class AsyncTest {
 2023-01-29 16:47:12.508  INFO 13332 --- [ taskExecutor-4] c.w.a.service.async.impl.TestAsyncImpl   : == async end==
 
 ```
+
 可以发现，该方法使用了线程池.
+
 ### 6、打印线程池情况（自主选择）
 
-- 编写ThreadPoolTaskExecutor继承类
+- 编写 ThreadPoolTaskExecutor 继承类
+
 ```java
 package com.walker.async.common.config;
 
@@ -185,7 +206,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 //1、继承ThreadPoolTaskExecutor
 public class VisibleThreadPoolTaskExecutor extends ThreadPoolTaskExecutor  {
 
-    
+
     //2、编写打印线程池方法
     private void log(String method){
         ThreadPoolExecutor threadPoolExecutor = getThreadPoolExecutor();
@@ -204,7 +225,7 @@ public class VisibleThreadPoolTaskExecutor extends ThreadPoolTaskExecutor  {
     }
 
 
-    
+
     //3、重写方法，进行日志的记录
     @Override
     public void execute(Runnable task) {
@@ -246,6 +267,7 @@ public class VisibleThreadPoolTaskExecutor extends ThreadPoolTaskExecutor  {
 ```
 
 - 重新编写线程池配置类
+
 ```java
 package com.walker.async.common.config;
 
@@ -281,7 +303,7 @@ public class ThreadPoolConfig {
     }
 
 
-    
+
     @Bean("visibleTaskExecutor")
     public Executor visible() {
 
@@ -302,11 +324,13 @@ public class ThreadPoolConfig {
 
 ```
 
-- service和实现类也重新编写
+- service 和实现类也重新编写
+
 ```java
 void visibleAsync();
 
 ```
+
 ```java
     /**
     * 可视化，可以打印线程池情况
@@ -321,6 +345,7 @@ void visibleAsync();
 ```
 
 - 测试
+
 ```java
 package com.walker.async;
 

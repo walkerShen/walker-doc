@@ -1,13 +1,14 @@
 分类：
 
-- Java Web中提供的Filter
-- SpringMvc中提供的拦截器Interceptor
-- Spring提供的AOP技术+自定义注解
+- Java Web 中提供的 Filter
+- SpringMvc 中提供的拦截器 Interceptor
+- Spring 提供的 AOP 技术+自定义注解
 
-下边结合jwt、redis实现简单的实现
-这里redis整合的具体教程就不详细讲了，具体可以查看该文章
-[【redis系列】springboot整合redis](https://blog.csdn.net/Think_and_work/article/details/123165932?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522167532901816800180646138%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fblog.%2522%257D&request_id=167532901816800180646138&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~blog~first_rank_ecpm_v1~rank_v31_ecpm-1-123165932-null-null.blog_rank_default&utm_term=redis&spm=1018.2226.3001.4450)
+下边结合 jwt、redis 实现简单的实现
+这里 redis 整合的具体教程就不详细讲了，具体可以查看该文章
+[【redis 系列】springboot 整合 redis](https://blog.csdn.net/Think_and_work/article/details/123165932?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522167532901816800180646138%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fblog.%2522%257D&request_id=167532901816800180646138&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~blog~first_rank_ecpm_v1~rank_v31_ecpm-1-123165932-null-null.blog_rank_default&utm_term=redis&spm=1018.2226.3001.4450)
 首先先导入依赖
+
 ```xml
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -19,12 +20,16 @@
         </dependency>
 
 ```
-### filter方式
-这种方式目前是不大推荐的，因为它需要手动设置需要进行拦截的接口
-![](https://img-blog.csdnimg.cn/img_convert/d27a1cde379d212befc54cfb7c506d7f.png#averageHue=#312d2c&clientId=u2771c5eb-b1d5-4&from=paste&height=250&id=u916148d9&name=image.png&originHeight=312&originWidth=907&originalType=binary&ratio=1&rotation=0&showTitle=false&size=41114&status=done&style=none&taskId=uf530d3cf-2c56-41e1-a528-85197c9d83d&title=&width=725.6#errorMessage=unknown%20error&id=gOhBk&originHeight=312&originWidth=907&originalType=binary&ratio=1&rotation=0&showTitle=false&status=error&style=none)
 
-#### 1、jwt参数类、配置
-这个的目的是为了将参数封装在类里面，不需要每次都是使用@Value去获取。
+### filter 方式
+
+这种方式目前是不大推荐的，因为它需要手动设置需要进行拦截的接口
+![image](https://img-blog.csdnimg.cn/img_convert/d27a1cde379d212befc54cfb7c506d7f.png#averageHue=#312d2c&clientId=u2771c5eb-b1d5-4&from=paste&height=250&id=u916148d9&name=image.png&originHeight=312&originWidth=907&originalType=binary&ratio=1&rotation=0&showTitle=false&size=41114&status=done&style=none&taskId=uf530d3cf-2c56-41e1-a528-85197c9d83d&title=&width=725.6#errorMessage=unknown%20error&id=gOhBk&originHeight=312&originWidth=907&originalType=binary&ratio=1&rotation=0&showTitle=false&status=error&style=none)
+
+#### 1、jwt 参数类、配置
+
+这个的目的是为了将参数封装在类里面，不需要每次都是使用@Value 去获取。
+
 ```java
 package com.walker.dianping.common.properties;
 
@@ -43,7 +48,9 @@ public class JWTProperties {
 }
 
 ```
+
 **application.yml**
+
 ```yaml
 jwt:
   # 加密密钥
@@ -56,10 +63,14 @@ jwt:
   whiteList: /login
 ```
 
+<!-- more -->
+
 #### 2、编写过滤器 TokenFilter
-首先需要实现Filter，然后去重写他的方法
+
+首先需要实现 Filter，然后去重写他的方法
 过滤方法的逻辑大致如下：
 ![](https://img-blog.csdnimg.cn/img_convert/129b89d1d3e3d3b750418826dbf525c6.png#averageHue=#f9f8f8&clientId=u4c28bc56-6486-4&from=paste&height=518&id=u2382529d&name=image.png&originHeight=647&originWidth=367&originalType=binary&ratio=1&rotation=0&showTitle=false&size=52283&status=done&style=none&taskId=uba841e94-bf4e-43fd-ae45-211c8195e50&title=&width=293.6#errorMessage=unknown%20error&id=r7YD1&originHeight=647&originWidth=367&originalType=binary&ratio=1&rotation=0&showTitle=false&status=error&style=none)
+
 ```java
 package com.walker.dianping.common.config.interceptor;
 
@@ -96,7 +107,7 @@ public class TokenFilter implements Filter {
     //redisTemplate redis的工具类
     @Autowired
     private StringRedisTemplate redisTemplate;
-    
+
 
     String WHILE_LIST="/login";
     String TOKEN_USER_KEY="token:user:";
@@ -108,7 +119,7 @@ public class TokenFilter implements Filter {
     }
 
 
-    
+
     //过滤方法
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -117,15 +128,15 @@ public class TokenFilter implements Filter {
 
         String requestURI = request.getRequestURI();
         //如果不在白名单中，则检测token是否正常
-        if(!WHILE_LIST.contains(requestURI)){	
+        if(!WHILE_LIST.contains(requestURI)){
 
-            //获取请求头的参数 
+            //获取请求头的参数
             String token = request.getHeader(jwtProperties.getHeader());
             if(StrUtil.isEmpty(token)){
                 resp(servletResponse,"账号未登录");
                 return;
             }
-            
+
             //从redis中获取token是否存在，是否过期
             String json = redisTemplate.opsForValue().get(TOKEN_USER_KEY + token);
             if(StrUtil.isEmpty(json)){
@@ -158,7 +169,9 @@ public class TokenFilter implements Filter {
 }
 
 ```
-#### 3、WebMvcConfig 实现WebMvcConfigurer
+
+#### 3、WebMvcConfig 实现 WebMvcConfigurer
+
 ```java
 package com.walker.dianping.common.config;
 
@@ -202,7 +215,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
 }
 
 ```
+
 #### 4、编写测试接口
+
 ```java
 package com.walker.dianping.controller;
 
@@ -223,17 +238,20 @@ public class TestController {
 
 ```
 
-- 请求头未带token时
+- 请求头未带 token 时
 
 [外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-xFP0pqwq-1675924860207)([https://cdn.nlark.com/yuque/0/2023/png/21370279/1675331842944-17baa622-b569-4b4c-8a98-0775808033ae.png#averageHue=%23fcfbfb&clientId=u2771c5eb-b1d5-4&from=paste&height=535&id=uf2bdddf8&name=image.png&originHeight=669&originWidth=1457&originalType=binary&ratio=1&rotation=0&showTitle=false&size=59731&status=done&style=none&taskId=u888d20f1-82df-4dac-a351-1755efd1f0b&title=&width=1165.6)]](https://cdn.nlark.com/yuque/0/2023/png/21370279/1675331842944-17baa622-b569-4b4c-8a98-0775808033ae.png#averageHue=%23fcfbfb&clientId=u2771c5eb-b1d5-4&from=paste&height=535&id=uf2bdddf8&name=image.png&originHeight=669&originWidth=1457&originalType=binary&ratio=1&rotation=0&showTitle=false&size=59731&status=done&style=none&taskId=u888d20f1-82df-4dac-a351-1755efd1f0b&title=&width=1165.6)])
 
-- 请求头带token时
+- 请求头带 token 时
 
 ![](https://img-blog.csdnimg.cn/img_convert/cbc43c2b0a60f6855c8842e8826d021a.png#averageHue=#fcfcfb&clientId=u2771c5eb-b1d5-4&from=paste&height=565&id=u18324933&name=image.png&originHeight=706&originWidth=1454&originalType=binary&ratio=1&rotation=0&showTitle=false&size=70018&status=done&style=none&taskId=u51a52655-d95e-4611-990c-ecaf4b44157&title=&width=1163.2#errorMessage=unknown%20error&id=qlZgp&originHeight=706&originWidth=1454&originalType=binary&ratio=1&rotation=0&showTitle=false&status=error&style=none)
 
 ### HandlerInterceptor 拦截器
-这个接口是springboot自带的，实现起来方便了不少
-#### 1、编写token拦截器
+
+这个接口是 springboot 自带的，实现起来方便了不少
+
+#### 1、编写 token 拦截器
+
 ```java
 package com.walker.dianping.common.config.interceptor;
 
@@ -300,7 +318,9 @@ public class TokenInterceptor implements HandlerInterceptor {
 }
 
 ```
-#### 2、编写webMvcConfig
+
+#### 2、编写 webMvcConfig
+
 ```java
 package com.walker.dianping.common.config.mvc;
 
@@ -336,26 +356,31 @@ public class WebMvcConfig implements WebMvcConfigurer {
 }
 
 ```
+
 3、测试
 现在是将"/user/login"作为白名单，不进行拦截，所以下面做两个测试的方式
 
-- user/login接口
+- user/login 接口
 
 ![](https://img-blog.csdnimg.cn/img_convert/e91df2fcefef93758e56457038b7af1e.png#averageHue=#fcfcfb&clientId=u6b82fa0c-fb1d-4&from=paste&height=616&id=u5abc6033&name=image.png&originHeight=770&originWidth=1463&originalType=binary&ratio=1&rotation=0&showTitle=false&size=84503&status=done&style=none&taskId=uec554a58-ea9e-413d-9b14-5e9f5a0a782&title=&width=1170.4#errorMessage=unknown%20error&id=yKD8Y&originHeight=770&originWidth=1463&originalType=binary&ratio=1&rotation=0&showTitle=false&status=error&style=none)
-返回结果是200，是ok的，因为不需要被拦截
+返回结果是 200，是 ok 的，因为不需要被拦截
 
-- test/get接口，不带token时
+- test/get 接口，不带 token 时
 
 ![](https://img-blog.csdnimg.cn/img_convert/6031bc499814b49ae9a60501ae1d79dc.png#averageHue=#fcfcfc&clientId=u6b82fa0c-fb1d-4&from=paste&height=545&id=u39f9ef17&name=image.png&originHeight=681&originWidth=1402&originalType=binary&ratio=1&rotation=0&showTitle=false&size=67181&status=done&style=none&taskId=u9bfb4b2b-1710-4655-b944-4341a5c25d5&title=&width=1121.6#errorMessage=unknown%20error&id=upLEU&originHeight=681&originWidth=1402&originalType=binary&ratio=1&rotation=0&showTitle=false&status=error&style=none)
-可以发现，走了拦截器的方法，因为其未带token，所以返回500和未登录
+可以发现，走了拦截器的方法，因为其未带 token，所以返回 500 和未登录
 
-- test/get接口，带token时
+- test/get 接口，带 token 时
 
 ![](https://img-blog.csdnimg.cn/img_convert/781889e632003b630f6c3fc246a430e0.png#averageHue=#fdfcfc&clientId=u6b82fa0c-fb1d-4&from=paste&height=569&id=ub36049d8&name=image.png&originHeight=711&originWidth=1385&originalType=binary&ratio=1&rotation=0&showTitle=false&size=66747&status=done&style=none&taskId=u14e8149d-eb80-4912-93d4-0b6334cdb98&title=&width=1108#errorMessage=unknown%20error&id=tc5wg&originHeight=711&originWidth=1385&originalType=binary&ratio=1&rotation=0&showTitle=false&status=error&style=none)
-可以发现返回200
+可以发现返回 200
+
 ### aop+注解方式
-这个是编写一个注解IgnoreToken，然后如果接口中有带该方法的，则认为是白名单，不需要做token的校验
+
+这个是编写一个注解 IgnoreToken，然后如果接口中有带该方法的，则认为是白名单，不需要做 token 的校验
+
 #### 1、导入依赖
+
 ```xml
      <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -367,7 +392,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
 ```
 
 #### 2、注解类
-定义该注解，如果是带有该注解的，则是白名单，不需要进行token的校验
+
+定义该注解，如果是带有该注解的，则是白名单，不需要进行 token 的校验
+
 ```java
 package com.walker.dianping.common.annotation;
 
@@ -389,7 +416,9 @@ public @interface IgnoreToken {
 }
 
 ```
+
 #### 3、编写切面类
+
 切面拦截方法大概流程如下：
 ![](https://img-blog.csdnimg.cn/img_convert/ffa7a7c69e26dd8e8699be1d5cf49a14.png#averageHue=#f9f9f8&clientId=u4c28bc56-6486-4&from=paste&height=244&id=u1b2cf3d8&name=image.png&originHeight=305&originWidth=915&originalType=binary&ratio=1&rotation=0&showTitle=false&size=35714&status=done&style=none&taskId=ueadc7ecb-9b48-41ad-a46a-eaf1a510b99&title=&width=732#errorMessage=unknown%20error&id=Ogx3R&originHeight=305&originWidth=915&originalType=binary&ratio=1&rotation=0&showTitle=false&status=error&style=none)
 
@@ -444,7 +473,7 @@ public class TokenAspect {
     //这里需要修改为自己的controller放置的地方
     @Pointcut(value = "execution(public * com.walker.dianping.controller.*.*(..))")
     public void allController() {
-        
+
     }
 
 
@@ -458,7 +487,7 @@ public class TokenAspect {
         //获取方法签名和调用的方法
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         Method method = methodSignature.getMethod();
-        
+
 
         //获取注解
         IgnoreToken annotation = method.getAnnotation(IgnoreToken.class);
@@ -507,8 +536,11 @@ public class TokenAspect {
 }
 
 ```
+
 #### 4、编写测试接口
+
 这里只做一个演示，具体的实现逻辑大家自己写，这里就不将代码列出来了
+
 ```java
 package com.walker.dianping.controller;
 
@@ -564,23 +596,25 @@ public class TbUserController {
 
 #### 5、测试
 
-- 调用user/test接口，未带token
+- 调用 user/test 接口，未带 token
 
 ![](https://img-blog.csdnimg.cn/img_convert/5d52f3d77635c204f15df694ebc7ac4e.png#averageHue=#fdfcfc&clientId=ub753deab-83c2-4&from=paste&height=565&id=ua9f56d1a&name=image.png&originHeight=706&originWidth=1433&originalType=binary&ratio=1&rotation=0&showTitle=false&size=61527&status=done&style=none&taskId=uad284332-a7a2-49a6-ac25-2686e09c43b&title=&width=1146.4#errorMessage=unknown%20error&id=JLQEx&originHeight=706&originWidth=1433&originalType=binary&ratio=1&rotation=0&showTitle=false&status=error&style=none)
 
-- /user/test 带token
+- /user/test 带 token
 
 ![](https://img-blog.csdnimg.cn/img_convert/b22f1c701d1a65dc77f1a45ae8ed5223.png#averageHue=#fcfbfb&clientId=ub753deab-83c2-4&from=paste&height=583&id=ua99013c7&name=image.png&originHeight=729&originWidth=1228&originalType=binary&ratio=1&rotation=0&showTitle=false&size=57970&status=done&style=none&taskId=ua3d7ce16-5ee1-428a-8ca7-4673d750458&title=&width=982.4#errorMessage=unknown%20error&id=f5I6u&originHeight=729&originWidth=1228&originalType=binary&ratio=1&rotation=0&showTitle=false&status=error&style=none)
 
-- /user/login接口
+- /user/login 接口
 
 发现是不需要进行拦截的
 ![](https://img-blog.csdnimg.cn/img_convert/e6c9446de029294603d9176759eb1194.png#averageHue=#fcfcfc&clientId=ub753deab-83c2-4&from=paste&height=609&id=u6d2d927f&name=image.png&originHeight=761&originWidth=1423&originalType=binary&ratio=1&rotation=0&showTitle=false&size=82339&status=done&style=none&taskId=ub328f2ab-7f6a-4e0a-9b26-5c91ba113a1&title=&width=1138.4#errorMessage=unknown%20error&id=wLtZX&originHeight=761&originWidth=1423&originalType=binary&ratio=1&rotation=0&showTitle=false&status=error&style=none)
+
 ### 参数解析器
+
 #### 1、编写解析器
 
-- 先实现HandlerMethodArgumentResolver接口
-- 
+- 先实现 HandlerMethodArgumentResolver 接口
+-
 
 ```java
 package com.walker.dianping.common.config.resolver;
@@ -628,7 +662,7 @@ public class LoginUserResolver implements HandlerMethodArgumentResolver {
         return parameter.hasParameterAnnotation(LoginUser.class);
     }
 
-    
+
 //重写解析参数方法
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
@@ -639,7 +673,7 @@ public class LoginUserResolver implements HandlerMethodArgumentResolver {
             return null;
         }
 
-        
+
         HttpServletRequest request = requestAttributes.getRequest();
         //从请求头中获取token
         String token = request.getHeader(jwtProperties.getHeader());
@@ -650,7 +684,7 @@ public class LoginUserResolver implements HandlerMethodArgumentResolver {
         //在redis中获取token
         String userJson = redisTemplate.opsForValue().get("token:user:" + token);
 
-        
+
         if (StrUtil.isEmpty(userJson)) {
             return null;
         }
@@ -661,7 +695,9 @@ public class LoginUserResolver implements HandlerMethodArgumentResolver {
 }
 
 ```
-#### 2、webMvcConfig配置
+
+#### 2、webMvcConfig 配置
+
 ```java
 package com.walker.dianping.common.config.mvc;
 
@@ -695,9 +731,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
 }
 
 ```
+
 3、测试
 
 - 测试接口
+
 ```java
     @GetMapping("/test")
     //使用@LoginUser注解和TbUserEntity去接收参数
@@ -706,14 +744,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
 ```
 
-- 使用postman带token发起请求
+- 使用 postman 带 token 发起请求
 
 ![](https://img-blog.csdnimg.cn/img_convert/c96a9ca7e33b8975dc76d364dc1fa9a2.png#averageHue=#fdfcfc&clientId=ub753deab-83c2-4&from=paste&height=614&id=ucb02471b&name=image.png&originHeight=767&originWidth=1417&originalType=binary&ratio=1&rotation=0&showTitle=false&size=76468&status=done&style=none&taskId=u083ec072-7407-429e-a4f7-64c07d0c1c2&title=&width=1133.6#errorMessage=unknown%20error&id=kqqjd&originHeight=767&originWidth=1417&originalType=binary&ratio=1&rotation=0&showTitle=false&status=error&style=none)
-发现结果可以获取到解析后的参数	
+发现结果可以获取到解析后的参数
 
-参考文档: 
-[Springboot实现登录拦截的三种方式](https://blog.csdn.net/HLH_2021/article/details/119491890?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0-119491890-blog-126308356.pc_relevant_3mothn_strategy_and_data_recovery&spm=1001.2101.3001.4242.1&utm_relevant_index=3)
+参考文档:
+[Springboot 实现登录拦截的三种方式](https://blog.csdn.net/HLH_2021/article/details/119491890?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0-119491890-blog-126308356.pc_relevant_3mothn_strategy_and_data_recovery&spm=1001.2101.3001.4242.1&utm_relevant_index=3)
 
->  我是程序员walker，一个持续学习，分享干货的博主
- 关注公众号【**I am Walker**】，一块进步
-
+> 我是程序员 walker，一个持续学习，分享干货的博主
+> 关注公众号【**I am Walker**】，一块进步
